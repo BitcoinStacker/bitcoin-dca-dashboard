@@ -1,76 +1,167 @@
 :root {
-    --mint-green: #d4edda;
-    --forest-green: #28a745;
+    --primary-green: #28a745;
     --dark-green: #1e7e34;
-    --light-green: #e8f5e9;
+    --light-green: #d4edda;
+    --mint-green: #e8f5e9;
+    --gray-100: #f8f9fa;
+    --gray-800: #343a40;
 }
 
 body {
-    background-color: #f8fff8;
+    background-color: var(--gray-100);
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--gray-800);
+}
+
+.calculator-card {
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .card {
+    border: none;
     border-radius: 12px;
-    border-top: 4px solid var(--forest-green);
-    background-color: white;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
 }
 
 .card-header {
-    background-color: var(--forest-green) !important;
+    background-color: var(--primary-green);
     color: white;
+    padding: 1.25rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
 }
 
-.btn-action {
-    background-color: var(--forest-green);
-    border: none;
-    color: white;
+.calculate-button {
     padding: 12px;
     font-weight: 500;
-    transition: all 0.3s;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+    border: none;
 }
 
-.btn-action:hover {
+.calculate-button:hover {
     background-color: var(--dark-green);
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
-#investmentAmount {
+.results-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.result-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    margin-bottom: 0.5rem;
+}
+
+.result-value {
+    font-size: 1.4rem;
+    font-weight: 600;
     color: var(--dark-green);
+}
+
+.recommendation-card {
+    background-color: var(--mint-green);
+    border-left: 4px solid var(--primary-green);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.recommendation-header {
+    font-size: 1.1rem;
+    color: var(--dark-green);
+    margin-bottom: 0.5rem;
+}
+
+.recommendation-amount {
     font-size: 2.5rem;
+    font-weight: 700;
+    color: var(--primary-green);
+    margin: 0.5rem 0;
 }
 
-.alert-info {
-    background-color: var(--light-green);
-    border-left: 4px solid var(--forest-green);
-    color: #155724;
+.recommendation-note {
+    font-size: 0.9rem;
+    color: #6c757d;
 }
 
-/* AHR999颜色分级 */
-.text-success { color: #218838; }  /* 深绿 */
-.text-primary { color: #28a745; }  /* 森林绿 */ 
-.text-warning { color: #8fd694; } /* 薄荷绿 */
-.text-danger { color: #ffd166; }   /* 柔和的黄色 */
+.index-guide {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.25rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.index-levels {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 1rem;
+}
+
+.index-levels li {
+    padding: 0.5rem 0;
+    border-left: 4px solid transparent;
+    padding-left: 1rem;
+}
+
+.undervalued {
+    border-left-color: var(--primary-green);
+}
+
+.fair-value {
+    border-left-color: #ffc107;
+}
+
+.overvalued {
+    border-left-color: #dc3545;
+}
+
+.status-indicator::before {
+    content: "•";
+    margin-right: 0.5rem;
+}
+
+.status-indicator[data-status="success"] {
+    color: var(--primary-green);
+}
+
+.status-indicator[data-status="error"] {
+    color: #dc3545;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .recommendation-amount {
+        font-size: 2rem;
+    }
+}
+
+/* Animation for loading spinner */
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
 
 .spinner-border {
-    color: var(--forest-green);
+    animation: spin 0.75s linear infinite;
+    display: inline-block;
     width: 3rem;
     height: 3rem;
-}
-
-footer {
-    padding: 20px 0;
-    font-size: 0.9rem;
-    color: #6c757d !important;
-}
-
-/* 响应式调整 */
-@media (max-width: 768px) {
-    .card {
-        border-radius: 0;
-        border-top: 4px solid var(--forest-green);
-    }
+    margin: 2rem auto;
 }

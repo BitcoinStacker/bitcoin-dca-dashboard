@@ -3,48 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin DCA Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Bitcoin DCA Calculator</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="icon" href="data:,"> <!-- 禁用favicon请求 -->
+    <link rel="stylesheet" href="styles.css">
+    <link rel="icon" href="data:,"> <!-- Disables favicon request -->
 </head>
 <body>
-    <div class="container mt-5">
-        <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="card shadow">
-                    <div class="card-header">
-                        <h2 class="text-center"><i class="fas fa-leaf me-2"></i>Bitcoin DCA Dashboard</h2>
+    <div class="container mt-4">
+        <header class="text-center mb-4">
+            <h1 class="display-4">
+                <i class="fas fa-coins me-2"></i>Bitcoin DCA Calculator
+            </h1>
+            <p class="lead text-muted">Smart dollar-cost averaging based on the AHR999 index</p>
+        </header>
+
+        <main class="calculator-card">
+            <div class="card shadow-lg">
+                <div class="card-header">
+                    <h2 class="h4 mb-0">
+                        <i class="fas fa-calculator me-2"></i>Investment Calculator
+                    </h2>
+                </div>
+                
+                <div class="card-body">
+                    <div class="form-group mb-4">
+                        <label for="baseInvestment" class="form-label">
+                            <i class="fas fa-dollar-sign me-1"></i>Monthly Investment Amount (USD)
+                        </label>
+                        <input type="number" class="form-control form-control-lg" 
+                               id="baseInvestment" value="100" min="1" step="1">
                     </div>
-                    <div class="card-body">
-                        <div class="mb-4">
-                            <label for="baseInvestment" class="form-label">Base DCA Amount (USDT)</label>
-                            <input type="number" class="form-control" id="baseInvestment" value="100" min="1">
+                    
+                    <button id="calculateBtn" class="btn btn-primary w-100 mb-4 calculate-button">
+                        <i class="fas fa-calculator me-2"></i>Calculate Recommendation
+                    </button>
+                    
+                    <div class="spinner-border text-primary d-none" id="loadingSpinner" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    
+                    <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
+                    
+                    <div id="results" class="d-none">
+                        <div class="results-grid">
+                            <div class="result-card">
+                                <div class="result-label">
+                                    <i class="fas fa-chart-line me-2"></i>365-Day Avg Price
+                                </div>
+                                <div id="dcaCost" class="result-value">-</div>
+                            </div>
+                            
+                            <div class="result-card">
+                                <div class="result-label">
+                                    <i class="fas fa-project-diagram me-2"></i>Growth Estimate
+                                </div>
+                                <div id="growthEstimate" class="result-value">-</div>
+                            </div>
+                            
+                            <div class="result-card">
+                                <div class="result-label">
+                                    <i class="fab fa-bitcoin me-2"></i>Current BTC Price
+                                </div>
+                                <div id="btcPrice" class="result-value">-</div>
+                            </div>
+                            
+                            <div class="result-card">
+                                <div class="result-label">
+                                    <i class="fas fa-tachometer-alt me-2"></i>AHR999 Index
+                                </div>
+                                <div id="ahr999" class="result-value">-</div>
+                            </div>
                         </div>
                         
-                        <button id="calculateBtn" class="btn btn-action w-100 mb-4">
-                            <i class="fas fa-calculator me-2"></i>Calculate DCA Recommendation
-                        </button>
-                        
-                        <div class="spinner-border d-none" id="loadingSpinner" role="status">
-                            <span class="visually-hidden">Loading...</span>
+                        <div class="recommendation-card mt-4">
+                            <div class="recommendation-header">
+                                <i class="fas fa-lightbulb me-2"></i>This Month's Recommendation
+                            </div>
+                            <div id="investmentAmount" class="recommendation-amount">-</div>
+                            <div class="recommendation-note">
+                                Based on current market conditions
+                            </div>
                         </div>
                         
-                        <div id="results" class="d-none">
-                            <!-- 结果展示区 -->
+                        <div class="index-guide mt-4">
+                            <h3 class="h5">
+                                <i class="fas fa-info-circle me-2"></i>Understanding the AHR999 Index
+                            </h3>
+                            <ul class="index-levels">
+                                <li class="undervalued">
+                                    <strong>Below 0.45:</strong> Bitcoin is severely undervalued (optimal buying)
+                                </li>
+                                <li class="fair-value">
+                                    <strong>0.45-1.2:</strong> Fair value range (normal accumulation)
+                                </li>
+                                <li class="overvalued">
+                                    <strong>Above 1.2:</strong> Potentially overvalued (reduce buying)
+                                </li>
+                            </ul>
                         </div>
-                        
-                        <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
+        
+        <footer class="text-center mt-4">
+            <p class="text-muted small">
+                Data provided by CoinGecko API | Updated: <span id="lastUpdated">-</span>
+                <br>
+                <span id="apiStatus" class="status-indicator"></span>
+            </p>
+        </footer>
     </div>
-
-    <footer class="mt-5 text-center text-muted">
-        <p>Data provided by CoinGecko API | Updated: <span id="lastUpdated"></span></p>
-    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="script.js"></script>
