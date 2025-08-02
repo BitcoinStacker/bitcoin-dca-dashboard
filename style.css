@@ -1,29 +1,62 @@
+:root {
+    --mint-green: #d4edda;
+    --forest-green: #28a745;
+    --dark-green: #1e7e34;
+    --light-green: #e8f5e9;
+}
+
 body {
-    background-color: #f8f9fa;
+    background-color: #f8fff8;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .card {
-    border-radius: 10px;
-    overflow: hidden;
+    border-radius: 12px;
+    border-top: 4px solid var(--forest-green);
+    background-color: white;
 }
 
 .card-header {
-    font-weight: bold;
+    background-color: var(--forest-green) !important;
+    color: white;
+    font-weight: 600;
+    letter-spacing: 0.5px;
 }
 
-.display-6 {
-    font-size: 1.8rem;
-    font-weight: bold;
+.btn-action {
+    background-color: var(--forest-green);
+    border: none;
+    color: white;
+    padding: 12px;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.btn-action:hover {
+    background-color: var(--dark-green);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
 }
 
 #investmentAmount {
-    color: #0d6efd;
+    color: var(--dark-green);
+    font-size: 2.5rem;
 }
 
-#loadingSpinner {
-    margin: 0 auto;
-    display: block;
+.alert-info {
+    background-color: var(--light-green);
+    border-left: 4px solid var(--forest-green);
+    color: #155724;
+}
+
+/* AHR999颜色分级 */
+.text-success { color: #218838; }  /* 深绿 */
+.text-primary { color: #28a745; }  /* 森林绿 */ 
+.text-warning { color: #8fd694; } /* 薄荷绿 */
+.text-danger { color: #ffd166; }   /* 柔和的黄色 */
+
+.spinner-border {
+    color: var(--forest-green);
     width: 3rem;
     height: 3rem;
 }
@@ -31,8 +64,13 @@ body {
 footer {
     padding: 20px 0;
     font-size: 0.9rem;
+    color: #6c757d !important;
 }
 
-.alert ul {
-    margin-bottom: 0;
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .card {
+        border-radius: 0;
+        border-top: 4px solid var(--forest-green);
+    }
 }

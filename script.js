@@ -1,60 +1,60 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // 获取DOM元素
     const calculateBtn = document.getElementById('calculateBtn');
     const baseInvestmentInput = document.getElementById('baseInvestment');
     const loadingSpinner = document.getElementById('loadingSpinner');
     const resultsSection = document.getElementById('results');
     const errorAlert = document.getElementById('errorAlert');
-    
-    // Update last updated time
-    document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
-    
+
+    // 显示美观的更新时间 (格式示例: "Jun 5, 2023, 2:30 PM")
+    const updateTimeElement = document.getElementById('lastUpdated');
+    const now = new Date();
+    updateTimeElement.textContent = now.toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+
+    // 主计算函数
     calculateBtn.addEventListener('click', async function() {
-        // Reset UI
+        // 重置UI状态
         resultsSection.classList.add('d-none');
         errorAlert.classList.add('d-none');
         loadingSpinner.classList.remove('d-none');
         
         try {
+            // 验证输入
             const baseInvestment = parseFloat(baseInvestmentInput.value);
-            if (isNaN(baseInvestment) {
-                throw new Error('Please enter a valid base investment amount');
+            if (isNaN(baseInvestment) || baseInvestment <= 0) {
+                throw new Error('Please enter a valid investment amount (must be > 0)');
             }
-            
-            // Get all required data
+
+            // 获取数据 (添加错误处理)
             const [btcPrice, historicalPrices] = await Promise.all([
-                getBtcPrice(),
-                getBtcHistoricalPrices()
+                getBtcPrice().catch(() => { throw new Error('Failed to get current BTC price') }),
+                getBtcHistoricalPrices().catch(() => { throw new Error('Failed to get historical data') })
             ]);
-            
+
+            // 计算指标
             const dcaCost = calculateDcaCost(historicalPrices);
             const coinAge = calculateCoinAge();
             const expGrowthEstimate = calculateExponentialGrowthEstimate(coinAge);
             const ahr999 = calculateAhr999(btcPrice, dcaCost, expGrowthEstimate);
             const investUsdt = getInvestUsdt(ahr999, baseInvestment);
-            
-            // Update UI with results
-            document.getElementById('dcaCost').textContent = `$${dcaCost.toFixed(2)}`;
-            document.getElementById('growthEstimate').textContent = `$${expGrowthEstimate.toFixed(2)}`;
-            document.getElementById('btcPrice').textContent = `$${btcPrice.toFixed(2)}`;
-            document.getElementById('ahr999').textContent = ahr999.toFixed(2);
+
+            // 更新UI
+            updateResultElement('dcaCost', dcaCost);
+            updateResultElement('growthEstimate', expGrowthEstimate);
+            updateResultElement('btcPrice', btcPrice);
+            updateResultElement('ahr999', ahr999);
             document.getElementById('investmentAmount').textContent = `$${investUsdt.toFixed(2)}`;
-            
-            // Color code AHR999 value
-            const ahr999Element = document.getElementById('ahr999');
-            if (ahr999 < 0.45) {
-                ahr999Element.classList.add('text-success');
-                ahr999Element.classList.remove('text-warning', 'text-danger');
-            } else if (ahr999 < 1.2) {
-                ahr999Element.classList.add('text-primary');
-                ahr999Element.classList.remove('text-success', 'text-danger');
-            } else if (ahr999 < 5) {
-                ahr999Element.classList.add('text-warning');
-                ahr999Element.classList.remove('text-success', 'text-danger');
-            } else {
-                ahr999Element.classList.add('text-danger');
-                ahr999Element.classList.remove('text-success', 'text-warning');
-            }
-            
+
+            // 根据AHR999值设置颜色
+            updateAhr999Color(ahr999);
+
+            // 显示结果
             loadingSpinner.classList.add('d-none');
             resultsSection.classList.remove('d-none');
         } catch (error) {
@@ -64,33 +64,53 @@ document.addEventListener('DOMContentLoaded', function() {
             errorAlert.classList.remove('d-none');
         }
     });
-    
-    // Initial calculation on page load
+
+    // 辅助函数：更新结果元素
+    function updateResultElement(id, value) {
+        const element = document.getElementById(id);
+        if (id === 'ahr999') {
+            element.textContent = value.toFixed(2);
+        } else {
+            element.textContent = `$${value.toFixed(2)}`;
+        }
+    }
+
+    // 辅助函数：更新AHR999颜色
+    function updateAhr999Color(ahr999) {
+        const element = document.getElementById('ahr999');
+        element.classList.remove('text-success', 'text-primary', 'text-warning', 'text-danger');
+        
+        if (ahr999 < 0.45) {
+            element.classList.add('text-success'); // 严重低估
+        } else if (ahr999 < 1.2) {
+            element.classList.add('text-primary'); // 低估
+        } else if (ahr999 < 5) {
+            element.classList.add('text-warning'); // 合理估值
+        } else {
+            element.classList.add('text-danger'); // 高估
+        }
+    }
+
+    // 初始加载时自动计算一次
     calculateBtn.click();
 });
 
-// API functions
+/* ========== API 函数 ========== */
 async function getBtcPrice() {
-    try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
-        const data = await response.json();
-        return data.bitcoin.usd;
-    } catch (error) {
-        throw new Error('Failed to fetch current BTC price');
-    }
+    const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+    if (!response.ok) throw new Error('API request failed');
+    const data = await response.json();
+    return data.bitcoin.usd;
 }
 
 async function getBtcHistoricalPrices(days = 365) {
-    try {
-        const response = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`);
-        const data = await response.json();
-        return data.prices.map(price => price[1]);
-    } catch (error) {
-        throw new Error('Failed to fetch historical BTC prices');
-    }
+    const response = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`);
+    if (!response.ok) throw new Error('API request failed');
+    const data = await response.json();
+    return data.prices.map(price => price[1]);
 }
 
-// Calculation functions
+/* ========== 计算函数 ========== */
 function calculateDcaCost(prices) {
     const sum = prices.reduce((acc, price) => acc + price, 0);
     return sum / prices.length;
@@ -111,6 +131,7 @@ function calculateAhr999(btcPrice, dcaCost, expGrowthEstimate) {
 }
 
 function getInvestUsdt(ahr999, baseInvestment = 100) {
-    // Modified to use the base investment amount
-    return baseInvestment / Math.max(ahr999, 0.1); // Prevent division by very small numbers
+    // 防止除以极小值 (最低0.1)
+    const adjustedAhr999 = Math.max(ahr999, 0.1);
+    return (baseInvestment / adjustedAhr999).toFixed(2);
 }
